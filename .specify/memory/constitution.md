@@ -1,50 +1,159 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+==================
+版本变更: [TEMPLATE] → 1.0.0（首次正式制定，视为初始版本）
+修改的原则: 无（本次为首次填充模板，非修订）
+新增章节:
+  - 核心原则 I. Go 语言与社区规范优先
+  - 核心原则 II. 中文文档与交互（非协商项）
+  - 核心原则 III. 单一可执行文件与前端外部化
+  - 核心原则 IV. 中后台基础能力与业务转发边界
+  - 核心原则 V. 固定技术栈（非协商项）
+  - 核心原则 VI. 多用户权限设计（非协商项）
+  - 技术栈与项目边界约束（第二章）
+  - 开发工作流与质量门禁（第三章）
+  - 治理（Governance）
+移除的章节: 无
+待更新的模板:
+  - ✅ .specify/templates/plan-template.md（"Constitution Check" 为通用占位引导，无需修改）
+  - ✅ .specify/templates/spec-template.md（未直接引用宪法条款，无需修改）
+  - ✅ .specify/templates/tasks-template.md（未直接引用宪法条款，无需修改）
+  - ✅ .specify/templates/checklist-template.md（未直接引用宪法条款，无需修改）
+遗留 TODO:
+  - TODO(RATIFICATION_DATE): 项目此前未正式批准过宪法文本，本版本将首次落笔日期同时作为批准日期与最近修订日期。
+说明: 起草过程中根据用户澄清，原则 V 的数据库约束由"仅支持 PostgreSQL"
+  调整为"MUST 同时支持 MySQL、PostgreSQL、SQLite"，该调整已并入本次
+  首次发布的 1.0.0 版本（尚未对外发布/评审），不作为独立修订版本处理。
+-->
 
-## Core Principles
+# gonex 项目宪法
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+## 核心原则
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### I. Go 语言与社区规范优先
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+gonex 的所有 Go 代码 MUST 遵循 Go 官方与社区公认的规范与最佳实践，包括但不限于
+Effective Go、标准 Go 项目布局（`cmd/`、`internal/`、`pkg/` 等）、`gofmt`/`goimports`
+格式化、`go vet` 与 `golangci-lint` 静态检查。所有合入主干的代码 MUST 通过格式化与
+静态检查，不得引入未经处理的告警。错误处理 MUST 遵循 Go 惯用方式（显式返回
+`error`、避免裸 `panic` 用于可预期的错误路径），不得为绕开检查而使用
+`//nolint` 之外的抑制手段掩盖问题。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**理由**：gonex 定位为可被社区与企业长期使用的独立后端程序，只有遵循统一、可预期
+的语言规范，才能保证代码可维护、可审查、可被外部贡献者理解。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### II. 中文文档与交互（非协商项）
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+除源代码本身（标识符命名、代码内联注释、提交历史中的代码差异）可按 Go 社区惯例使用
+英文外，本项目产出的所有面向人阅读的内容 MUST 使用中文，包括但不限于：需求规格
+（spec）、实施计划（plan）、任务列表（tasks）、README、设计文档、变更说明、
+PR/Issue 描述，以及与 AI 协作时提出的问题与得到的回答。任何自动化工具或 AI
+助手在本仓库中生成的非代码文档 MUST 为中文；如引用外部英文资料，MUST 提供中文
+摘要或翻译后再落入文档。
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+**理由**：项目团队与使用者以中文为主要工作语言，统一使用中文可以避免团队协作与
+知识沉淀过程中的语言障碍，代码本身沿用英文标识符是为了与 Go 生态工具链和社区
+惯例保持兼容。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### III. 单一可执行文件与前端外部化
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+gonex MUST 编译并发布为单一、无外部运行时依赖（数据库除外）的可执行二进制文件。
+用户部署时仅需提供一份 YAML 配置文件即可运行，不需要额外的安装步骤或运行时环境。
+本仓库 MUST NOT 包含任何前端源代码或前端构建产物；管理界面（React 页面）MUST 在
+运行时由 gonex 按配置动态加载，而非由本仓库构建、打包或内嵌。任何 PR 引入前端
+框架代码、`node_modules`、前端构建脚本等内容 MUST 被拒绝。
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+**理由**：将后端与前端解耦，保证 gonex 可以作为纯后端基础设施独立演进、独立发布，
+同时满足"一个可执行程序即可部署"的产品定位，避免前后端构建流程相互牵制。
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### IV. 中后台基础能力与业务转发边界
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+gonex 的职责边界 MUST 限定在中后台通用基础能力：多用户管理、登录认证、权限校验，
+以及按照配置的路径规则将 HTTP 请求转发（反向代理）到用户自行部署的实际业务
+HTTP 服务。gonex 自身 MUST NOT 实现任何特定业务逻辑；具体业务处理 MUST 交由被
+转发的下游服务完成。新增功能提案如超出上述边界（例如内置某类业务模块），MUST 在
+设计阶段被拒绝或改造为可配置的通用能力。
+
+**理由**：保持 gonex 作为通用中后台"壳"程序的定位，避免功能蔓延导致其演变为
+与具体业务耦合的重量级框架，从而失去可复用性与可维护性。
+
+### V. 固定技术栈（非协商项）
+
+gonex 的核心技术选型是经过评估的既定约束，MUST 遵循如下选型，不得随意替换：
+
+- HTTP 服务与路由：`gin`
+- 数据库访问与迁移：`sqlc`（生成类型安全的查询代码）+ `goose`（管理数据库迁移）
+- 数据库后端：MUST 同时支持 MySQL、PostgreSQL、SQLite 三种数据库；数据库相关代码
+  （`sqlc` 查询定义、`goose` 迁移脚本）MUST 为每种支持的数据库分别维护对应实现，
+  且三者的功能行为 MUST 保持一致，不得出现仅部分数据库可用的功能
+- 配置文件格式：YAML，解析库固定使用 `go.yaml.in/yaml/v4`
+- 命令行接口：`cobra`
+
+如确需引入替代技术栈（如更换 Web 框架、数据库类型或配置格式），MUST 先通过宪法
+修订流程（见"治理"章节）评估影响并显式批准，禁止在功能 PR 中"顺带"替换技术栈。
+
+**理由**：统一技术栈可以降低维护成本、减少依赖冲突，并确保团队与社区贡献者对
+项目结构有一致的预期。
+
+### VI. 多用户权限设计（非协商项）
+
+gonex 的多用户与权限体系 MUST 满足以下要求：
+
+- 用户身份认证（登录）MUST 使用安全的凭证存储方式（密码 MUST 加盐哈希存储，
+  MUST NOT 明文或可逆加密存储密码）。
+- 权限模型 MUST 支持基于角色的访问控制（RBAC），至少包含"用户—角色—权限"的
+  多对多关系，支持按接口路径/资源粒度进行授权校验。
+- 权限校验 MUST 在请求转发到下游业务服务之前完成（网关层前置校验），未授权请求
+  MUST NOT 被转发到下游服务。
+- 涉及登录状态、权限变更、敏感操作（如删除用户、赋权）的操作 MUST 可被审计
+  （至少记录操作人、操作时间、操作内容）。
+
+**理由**：多用户管理与权限控制是 gonex 的核心价值主张之一，安全缺陷会直接影响
+所有基于 gonex 构建的下游系统，因此该原则不可协商。
+
+## 技术栈与项目边界约束
+
+- Go 版本 MUST 与 `go.mod` 中声明的版本保持一致，升级 Go 版本需在 PR 中说明兼容性
+  影响。
+- 数据库结构变更 MUST 通过 `goose` 迁移文件管理，且 MUST 为 MySQL、PostgreSQL、
+  SQLite 三种方言分别提供对应迁移脚本；禁止手工在生产数据库上执行未纳入迁移历史
+  的 DDL。
+- 所有数据库查询 MUST 通过 `sqlc` 生成的代码访问，且 MUST 为三种支持的数据库分别
+  生成对应实现；禁止在业务代码中拼接原始 SQL 字符串（参数化查询除外的必要场景需
+  在 PR 中说明理由）。
+- 配置文件 Schema 变更（新增/删除/重命名配置项）MUST 保持向后兼容或提供明确的
+  升级说明；破坏性配置变更 MUST 在文档中以中文注明迁移步骤。
+- 本仓库 MUST NOT 包含前端代码、前端依赖清单（如 `package.json`）或前端构建产物；
+  与前端集成相关的内容仅限于"动态加载路径配置"的后端实现。
+
+## 开发工作流与质量门禁
+
+- 所有合入主干的 PR MUST 通过 `gofmt`、`go vet`、`golangci-lint` 检查以及现有
+  自动化测试。
+- 涉及权限、认证、请求转发核心逻辑的变更 MUST 附带单元测试或集成测试覆盖关键
+  路径（含正常与拒绝场景）。
+- PR 描述、Commit 说明、Code Review 意见 MUST 使用中文（遵循核心原则 II）。
+- 任何偏离本宪法原则的设计 MUST 在对应的 `plan.md` 的"Complexity Tracking"
+  章节中说明原因及被拒绝的更简单替代方案，并在评审中获得明确批准后方可实施。
+
+## 治理
+
+本宪法是 gonex 项目所有开发实践、设计评审与代码评审的最高依据，其效力高于任何
+个人偏好或历史惯例。
+
+- **修订流程**：任何对本宪法的修订 MUST 以 PR 形式提出，说明修订动机、影响范围，
+  并同步检查 `.specify/templates/` 下的 `plan-template.md`、`spec-template.md`、
+  `tasks-template.md` 等相关模板是否需要联动更新。修订 MUST 经项目维护者评审通过
+  后方可合并。
+- **版本管理**：本宪法版本号遵循语义化版本（MAJOR.MINOR.PATCH）：
+  - MAJOR：原则被移除或发生不兼容的重新定义；
+  - MINOR：新增原则或对现有原则做实质性扩展；
+  - PATCH：措辞澄清、错别字修正等不改变语义的调整。
+- **合规审查**：所有 PR 与代码评审 MUST 核对是否符合本宪法各项原则；发现违反
+  "非协商项"（原则 II、V、VI）的实现 MUST 在合并前修正，不得以"后续修复"为由
+  放行。
+- 运行时开发的补充指引（如存在）以本仓库根目录下的 Agent 指引文件（例如
+  `CLAUDE.md`）为准，但该类文件 MUST NOT 与本宪法冲突；如发生冲突，以本宪法
+  为准。
+
+**Version**: 1.0.0 | **Ratified**: 2026-07-06 | **Last Amended**: 2026-07-06
